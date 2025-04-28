@@ -10,7 +10,6 @@ app = FastAPI(
 async def root(
     request: Request,
 ):
-    print(request)
     docs_url = request.url.replace(path="/docs")
     return {
         "message": "This is the root of the movie catalog API",
