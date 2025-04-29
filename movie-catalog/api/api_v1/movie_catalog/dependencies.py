@@ -1,14 +1,14 @@
 from fastapi import HTTPException
 from starlette import status
 
-from api.api_v1.movie_catalog.crud import MOVIES
+from api.api_v1.movie_catalog.crud import storage
 from schemas.movie import Movie
 
 
 def prefetch_movie_by_slug(
     slug: str,
 ) -> Movie:
-    movie: Movie | None = next(filter(lambda m: m.slug == slug, MOVIES), None)
+    movie: Movie | None = storage.get_by_slug(slug)
     if movie:
         return movie
     raise HTTPException(

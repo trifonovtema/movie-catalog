@@ -8,7 +8,7 @@ from fastapi import (
     Form,
 )
 
-from api.api_v1.movie_catalog.crud import MOVIES
+from api.api_v1.movie_catalog.crud import storage
 from api.api_v1.movie_catalog.dependencies import prefetch_movie_by_slug
 from schemas.movie import (
     Movie,
@@ -26,7 +26,7 @@ router = APIRouter(
     response_model=list[Movie],
 )
 async def get_all_movies():
-    return MOVIES
+    return storage.get()
 
 
 @router.post(
@@ -40,12 +40,14 @@ async def add_movie_from_form(
     description: Annotated[str, Form()],
     year: Annotated[int, Form()],
 ):
-    return Movie(
+    movie = Movie(
         slug=slug,
         name=name,
         description=description,
         year=year,
     )
+    storage.create(movie)
+    return movie
 
 
 @router.post(
@@ -56,10 +58,15 @@ async def add_movie_from_form(
 async def add_movie(
     movie: MovieCreate,
 ):
-    return Movie(
-        **movie.model_dump(),
+    storage.create(
+        Movie(
+            **movie.model_dump(),
+        )
     )
 
+    return  Movie(
+            **movie.model_dump(),
+        )
 
 @router.get(
     "/{slug}",
