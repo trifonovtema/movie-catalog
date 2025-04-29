@@ -1,6 +1,12 @@
+import random
 from typing import Annotated
 
-from fastapi import Depends, APIRouter
+from fastapi import (
+    Depends,
+    APIRouter,
+    status,
+    Form,
+)
 from starlette.requests import Request
 
 from api.api_v1.movie_catalog.crud import MOVIES
@@ -19,6 +25,25 @@ router = APIRouter(
 )
 async def get_all_movies():
     return MOVIES
+
+
+@router.post(
+    "/form",
+    response_model=Movie,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_movie_from_form(
+    name: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    year: Annotated[int, Form()],
+):
+    movie_id = random.randint(0, 1000000)
+    return Movie(
+        id=movie_id,
+        name=name,
+        description=description,
+        year=year,
+    )
 
 
 @router.get(
