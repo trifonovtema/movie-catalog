@@ -2,13 +2,14 @@ from pydantic import BaseModel
 
 
 class MovieBase(BaseModel):
+    slug: str
     name: str
     description: str
     year: int
 
 
 class Movie(MovieBase):
-    id: int
+    pass
 
 
 class MovieCreate(MovieBase):

@@ -9,7 +9,7 @@ from fastapi import (
 )
 
 from api.api_v1.movie_catalog.crud import MOVIES
-from api.api_v1.movie_catalog.dependencies import prefetch_movie_by_id
+from api.api_v1.movie_catalog.dependencies import prefetch_movie_by_slug
 from schemas.movie import (
     Movie,
     MovieCreate,
@@ -35,13 +35,13 @@ async def get_all_movies():
     status_code=status.HTTP_201_CREATED,
 )
 async def add_movie_from_form(
+    slug: Annotated[str, Form()],
     name: Annotated[str, Form()],
     description: Annotated[str, Form()],
     year: Annotated[int, Form()],
 ):
-    movie_id = random.randint(0, 1000000)
     return Movie(
-        id=movie_id,
+        slug=slug,
         name=name,
         description=description,
         year=year,
@@ -56,25 +56,24 @@ async def add_movie_from_form(
 async def add_movie(
     movie: MovieCreate,
 ):
-    movie_id = random.randint(0, 1000000)
     return Movie(
-        id=movie_id,
         **movie.model_dump(),
     )
 
 
 @router.get(
-    "/{movie_id}",
+    "/{slug}",
     response_model=Movie,
+    status_code=status.HTTP_200_OK,
 )
 @router.get(
-    "/{movie_id}/",
+    "/{slug}/",
     response_model=Movie,
 )
-async def get_movie_by_id(
+async def get_movie_by_slug(
     movie: Annotated[
         Movie,
-        Depends(prefetch_movie_by_id),
+        Depends(prefetch_movie_by_slug),
     ],
 ):
     return movie
