@@ -7,36 +7,7 @@ from schemas.movie import (
     MovieUpdatePartial,
 )
 
-MOVIES = [
-    Movie(
-        slug="one",
-        name="One",
-        description="Movie One",
-        year=2021,
-        notes="",
-    ),
-    Movie(
-        slug="two",
-        name="Two",
-        description="Movie Two",
-        year=2022,
-        notes="",
-    ),
-    Movie(
-        slug="three",
-        name="Three",
-        description="Movie Three",
-        year=2023,
-        notes="",
-    ),
-    Movie(
-        slug="four",
-        name="Four",
-        description="Movie Four",
-        year=2024,
-        notes="",
-    ),
-]
+
 
 
 class MovieStorage(BaseModel):
@@ -117,42 +88,3 @@ except ValidationError as e:
     storage = MovieStorage()
     storage.save_state()
 
-# storage.create(
-#     Movie(
-#         slug="one",
-#         name="One",
-#         description="Movie One",
-#         year=2021,
-#         notes="",
-#     )
-# )
-#
-# storage.create(
-#     Movie(
-#         slug="two",
-#         name="Two",
-#         description="Movie Two",
-#         year=2022,
-#         notes="",
-#     )
-# )
-#
-# storage.create(
-#     Movie(
-#         slug="three",
-#         name="Three",
-#         description="Movie Three",
-#         year=2023,
-#         notes="",
-#     )
-# )
-#
-# storage.create(
-#     Movie(
-#         slug="four",
-#         name="Four",
-#         description="Movie Four",
-#         year=2024,
-#         notes="",
-#     )
-# )
