@@ -1,4 +1,4 @@
-from schemas.movie import Movie
+from schemas.movie import Movie, MovieUpdate
 
 MOVIES = [
     Movie(
@@ -45,6 +45,11 @@ class MovieStorage:
 
     def delete(self, movie: Movie) -> None:
         self.delete_by_slug(slug=movie.slug)
+
+    def update(self, movie: Movie, movie_in: MovieUpdate) -> Movie:
+        for field, value in movie_in:
+            setattr(movie, field, value)
+        return movie
 
 
 storage = MovieStorage()
