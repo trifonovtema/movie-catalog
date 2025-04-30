@@ -15,5 +15,11 @@ class MovieUpdate(MovieBase):
     pass
 
 
+class MovieUpdatePartial(MovieBase):
+    name: str | None = None
+    description: str | None = None
+    year: int | None = None
+
+
 class MovieCreate(MovieBase):
     slug: str
