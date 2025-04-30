@@ -49,12 +49,8 @@ async def add_movie_from_form(
 async def add_movie(
     movie: MovieCreate,
 ) -> Movie:
-    storage.create(
+    return storage.create(
         Movie(
             **movie.model_dump(),
         )
-    )
-
-    return Movie(
-        **movie.model_dump(),
     )
