@@ -5,7 +5,7 @@ from starlette import status
 
 from api.api_v1.movie_catalog.crud import storage
 from api.api_v1.movie_catalog.dependencies import prefetch_movie_by_slug
-from schemas.movie import Movie, MovieUpdate
+from schemas.movie import Movie, MovieUpdate, MovieUpdatePartial
 
 MovieBySlug = Annotated[
     Movie,
@@ -51,6 +51,17 @@ async def update_movie_by_slug(
     movie_in: MovieUpdate,
 ):
     return storage.update(movie, movie_in)
+
+
+@router.patch(
+    path="/",
+    status_code=status.HTTP_200_OK,
+)
+async def update_movie_by_slug(
+    movie: MovieBySlug,
+    movie_in: MovieUpdatePartial,
+):
+    return storage.update_partial(movie, movie_in)
 
 
 @router.delete(
