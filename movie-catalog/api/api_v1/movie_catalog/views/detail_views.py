@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, APIRouter
+from fastapi import Depends, APIRouter, BackgroundTasks
 from starlette import status
 
 from api.api_v1.movie_catalog.crud import storage
@@ -49,7 +49,9 @@ async def get_movie_by_slug(
 async def update_movie_by_slug(
     movie: MovieBySlug,
     movie_in: MovieUpdate,
+    background_tasks: BackgroundTasks,
 ) -> Movie:
+    background_tasks.add_task(storage.save_state)
     return storage.update(movie, movie_in)
 
 
@@ -60,7 +62,9 @@ async def update_movie_by_slug(
 async def update_movie_by_slug(
     movie: MovieBySlug,
     movie_in: MovieUpdatePartial,
+    background_tasks: BackgroundTasks,
 ) -> Movie:
+    background_tasks.add_task(storage.save_state)
     return storage.update_partial(movie, movie_in)
 
 
@@ -70,5 +74,7 @@ async def update_movie_by_slug(
 )
 async def delete_movie_by_slug(
     movie: MovieBySlug,
+    background_tasks: BackgroundTasks,
 ) -> None:
     storage.delete(movie)
+    background_tasks.add_task(storage.save_state)

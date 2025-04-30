@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, BackgroundTasks
 from starlette import status
 
 from api.api_v1.movie_catalog.crud import storage
@@ -48,7 +48,9 @@ async def add_movie_from_form(
 )
 async def add_movie(
     movie: MovieCreate,
+    background_tasks: BackgroundTasks,
 ) -> Movie:
+    background_tasks.add_task(storage.save_state)
     return storage.create(
         Movie(
             **movie.model_dump(),
