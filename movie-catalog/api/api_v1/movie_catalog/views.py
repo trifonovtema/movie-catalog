@@ -64,9 +64,10 @@ async def add_movie(
         )
     )
 
-    return  Movie(
-            **movie.model_dump(),
-        )
+    return Movie(
+        **movie.model_dump(),
+    )
+
 
 @router.get(
     "/{slug}",
@@ -84,3 +85,31 @@ async def get_movie_by_slug(
     ],
 ):
     return movie
+
+
+@router.delete(
+    "/{slug}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_204_NO_CONTENT: {
+            "description": "Movie deleted successfully",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "description": "Movie not found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Movie with slug 'slug' not found",
+                    },
+                },
+            },
+        },
+    },
+)
+async def delete_movie_by_slug(
+    movie: Annotated[
+        Movie,
+        Depends(prefetch_movie_by_slug),
+    ],
+):
+    storage.delete(movie)
