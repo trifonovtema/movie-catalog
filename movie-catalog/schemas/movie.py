@@ -2,15 +2,18 @@ from pydantic import BaseModel
 
 
 class MovieBase(BaseModel):
-    slug: str
     name: str
     description: str
     year: int
 
 
 class Movie(MovieBase):
+    slug: str
+
+
+class MovieUpdate(MovieBase):
     pass
 
 
 class MovieCreate(MovieBase):
-    pass
+    slug: str
