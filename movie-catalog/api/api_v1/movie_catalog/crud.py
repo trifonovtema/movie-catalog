@@ -1,4 +1,8 @@
-from schemas.movie import Movie, MovieUpdate, MovieUpdatePartial
+from schemas.movie import (
+    Movie,
+    MovieUpdate,
+    MovieUpdatePartial,
+)
 
 MOVIES = [
     Movie(
@@ -6,24 +10,28 @@ MOVIES = [
         name="One",
         description="Movie One",
         year=2021,
+        notes="",
     ),
     Movie(
         slug="two",
         name="Two",
         description="Movie Two",
         year=2022,
+        notes="",
     ),
     Movie(
         slug="three",
         name="Three",
         description="Movie Three",
         year=2023,
+        notes="",
     ),
     Movie(
         slug="four",
         name="Four",
         description="Movie Four",
         year=2024,
+        notes="",
     ),
 ]
 
@@ -66,6 +74,7 @@ storage.create(
         name="One",
         description="Movie One",
         year=2021,
+        notes="",
     )
 )
 
@@ -75,6 +84,7 @@ storage.create(
         name="Two",
         description="Movie Two",
         year=2022,
+        notes="",
     )
 )
 
@@ -84,6 +94,7 @@ storage.create(
         name="Three",
         description="Movie Three",
         year=2023,
+        notes="",
     )
 )
 
@@ -93,5 +104,6 @@ storage.create(
         name="Four",
         description="Movie Four",
         year=2024,
+        notes="",
     )
 )
