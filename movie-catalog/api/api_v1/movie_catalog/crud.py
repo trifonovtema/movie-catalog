@@ -49,7 +49,7 @@ class MovieStorage(BaseModel):
             return MovieStorage()
         return cls.model_validate_json(MOVIE_STORAGE_FILEPATH.read_text())
 
-    def save_state(self):
+    def save_state(self) -> None:
         MOVIE_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
 
     # def save_to_disk(self):
