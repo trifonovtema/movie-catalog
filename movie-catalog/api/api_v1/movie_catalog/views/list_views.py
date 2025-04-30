@@ -4,7 +4,7 @@ from fastapi import APIRouter, Form
 from starlette import status
 
 from api.api_v1.movie_catalog.crud import storage
-from schemas.movie import Movie, MovieCreate
+from schemas.movie import Movie, MovieCreate, MovieRead
 
 router = APIRouter(
     prefix="/movies",
@@ -14,15 +14,15 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=list[Movie],
+    response_model=list[MovieRead],
 )
-async def get_all_movies():
+async def get_all_movies() -> list[Movie]:
     return storage.get()
 
 
 @router.post(
     "/form",
-    response_model=Movie,
+    response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
 )
 async def add_movie_from_form(
@@ -30,7 +30,7 @@ async def add_movie_from_form(
     name: Annotated[str, Form()],
     description: Annotated[str, Form()],
     year: Annotated[int, Form()],
-):
+) -> Movie:
     movie = Movie(
         slug=slug,
         name=name,
@@ -43,12 +43,12 @@ async def add_movie_from_form(
 
 @router.post(
     "/",
-    response_model=Movie,
+    response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
 )
 async def add_movie(
     movie: MovieCreate,
-):
+) -> Movie:
     storage.create(
         Movie(
             **movie.model_dump(),
