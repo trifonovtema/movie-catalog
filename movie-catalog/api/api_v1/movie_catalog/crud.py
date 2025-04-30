@@ -8,8 +8,6 @@ from schemas.movie import (
 )
 
 
-
-
 class MovieStorage(BaseModel):
     slug_to_movie: dict[str, Movie] = {}
     # file_name: str = MOVIE_STORAGE_FILEPATH
@@ -87,4 +85,3 @@ except ValidationError as e:
     print(f"Error loading storage: {e}")
     storage = MovieStorage()
     storage.save_state()
-
