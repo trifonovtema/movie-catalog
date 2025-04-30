@@ -9,6 +9,7 @@ class MovieBase(BaseModel):
 
 class Movie(MovieBase):
     slug: str
+    notes:str
 
 
 class MovieUpdate(MovieBase):
@@ -19,6 +20,9 @@ class MovieUpdatePartial(MovieBase):
     name: str | None = None
     description: str | None = None
     year: int | None = None
+
+class MovieRead(MovieBase):
+    slug: str
 
 
 class MovieCreate(MovieBase):
