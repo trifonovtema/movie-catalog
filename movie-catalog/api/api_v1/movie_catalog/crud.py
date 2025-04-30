@@ -1,4 +1,4 @@
-from schemas.movie import Movie, MovieUpdate
+from schemas.movie import Movie, MovieUpdate, MovieUpdatePartial
 
 MOVIES = [
     Movie(
@@ -48,6 +48,11 @@ class MovieStorage:
 
     def update(self, movie: Movie, movie_in: MovieUpdate) -> Movie:
         for field, value in movie_in:
+            setattr(movie, field, value)
+        return movie
+
+    def update_partial(self, movie: Movie, movie_in: MovieUpdatePartial) -> Movie:
+        for field, value in movie_in.model_dump(exclude_unset=True).items():
             setattr(movie, field, value)
         return movie
 
