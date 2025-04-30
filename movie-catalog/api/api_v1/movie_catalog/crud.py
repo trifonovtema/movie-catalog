@@ -1,3 +1,5 @@
+import logging
+
 from pydantic import BaseModel, ValidationError
 
 from core.config import MOVIE_STORAGE_FILEPATH
@@ -6,6 +8,8 @@ from schemas.movie import (
     MovieUpdate,
     MovieUpdatePartial,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class MovieStorage(BaseModel):
@@ -20,6 +24,7 @@ class MovieStorage(BaseModel):
 
     def save_state(self) -> None:
         MOVIE_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
+        logger.info("Storage saved on disk")
 
     # def save_to_disk(self):
     #     with open(self.file_name, "w") as f:
@@ -49,10 +54,12 @@ class MovieStorage(BaseModel):
     def get_by_slug(self, slug: str):
         return self.slug_to_movie.get(slug)
 
-    def create(self, movie: Movie):
+    def create(self, movie: Movie) -> Movie:
         self.slug_to_movie[movie.slug] = movie
         # self.save_to_disk()
         self.save_state()
+        logger.info("Movie %s created", movie.slug)
+        return movie
 
     def delete_by_slug(self, slug: str) -> None:
         self.slug_to_movie.pop(slug, None)
@@ -78,10 +85,19 @@ class MovieStorage(BaseModel):
         self.save_state()
         return movie
 
+    def init_storage(self):
+        try:
+            data = self.from_state()
+        except ValidationError as e:
+            logger.warning("Error loading storage: %s", e)
+            self.save_state()
+            logger.warning("Storage recreated")
+            return
 
-try:
-    storage = MovieStorage.from_state()
-except ValidationError as e:
-    print(f"Error loading storage: {e}")
-    storage = MovieStorage()
-    storage.save_state()
+        self.slug_to_movie.update(
+            data.slug_to_movie,
+        )
+        logger.warning("Storage loaded from disk")
+
+
+storage = MovieStorage()
