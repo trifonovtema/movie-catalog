@@ -47,7 +47,7 @@ def save_movie_storage_state(
         logger.info(f"Background task for save movie storage state added")
 
 
-def api_token_check(
+def api_token_check_for_unsafe_methods(
     request: Request,
     api_token: Annotated[
         str,
