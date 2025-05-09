@@ -84,8 +84,9 @@ class MovieStorage(BaseModel):
             value=movie.model_dump_json(),
         )
 
-    def delete_by_slug(self, slug: str) -> None:
-        self.slug_to_movie.pop(slug, None)
+    def delete_by_slug(self, slug: str) -> int:
+        # self.slug_to_movie.pop(slug, None)
+        return redis.hdel(config.REDIS_MOVIE_CATALOG_HASH_NAME, slug)
         # self.save_to_disk()
         # self.save_state()
 
