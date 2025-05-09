@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form, BackgroundTasks, Depends, HTTPException
 from starlette import status
 
-from api.api_v1.movie_catalog.crud import storage
+from api.api_v1.movie_catalog.crud import storage, MovieAlreadyExistsError
 from api.api_v1.movie_catalog.dependencies import (
     # save_movie_storage_state,
     # api_token_check_for_unsafe_methods,
@@ -85,9 +85,10 @@ async def add_movie_from_form(
 async def add_movie(
     movie: MovieCreate,
 ) -> Movie:
-    if not storage.get_by_slug(movie.slug):
-        return storage.create(movie_create=movie)
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail=f"Movie with slug={movie.slug!r} already exists.",
-    )
+    try:
+        return storage.create_or_raise_if_exists(movie_create=movie)
+    except MovieAlreadyExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Movie with slug={movie.slug!r} already exists.",
+        )

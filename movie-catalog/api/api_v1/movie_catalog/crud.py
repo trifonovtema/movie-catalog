@@ -22,6 +22,18 @@ redis = Redis(
 )
 
 
+class MovieBaseError(BaseException):
+    """
+    Base exception for MovieStorage
+    """
+
+
+class MovieAlreadyExistsError(MovieBaseError):
+    """
+    Movie Already Exists
+    """
+
+
 class MovieStorage(BaseModel):
     # slug_to_movie: dict[str, Movie] = {}
     # file_name: str = MOVIE_STORAGE_FILEPATH
@@ -79,6 +91,19 @@ class MovieStorage(BaseModel):
         self.save_to_storage(movie)
         logger.info("Movie %s created", movie.slug)
         return movie
+
+    @classmethod
+    def exists(cls, slug: str) -> bool:
+        return redis.hexists(
+            config.REDIS_MOVIE_CATALOG_HASH_NAME,
+            slug,
+        )
+
+    def create_or_raise_if_exists(self, movie_create: MovieCreate) -> Movie:
+        if not self.exists(movie_create.slug):
+            return self.create(movie_create)
+
+        raise MovieAlreadyExistsError()
 
     @classmethod
     def save_to_storage(cls, movie) -> int:
