@@ -8,7 +8,7 @@ from fastapi import (
     status,
 )
 from fastapi.params import Depends, Query, Header
-
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from api.api_v1.movie_catalog.crud import storage
 from core.config import API_TOKENS
 from schemas.movie import Movie
@@ -22,6 +22,12 @@ UNSAFE_METHODS = frozenset(
         "PUT",
         "PATCH",
     },
+)
+
+static_api_token = HTTPBearer(
+    scheme_name="api-token",
+    description="API Token",
+    auto_error=False,
 )
 
 
@@ -50,14 +56,21 @@ def save_movie_storage_state(
 def api_token_check_for_unsafe_methods(
     request: Request,
     api_token: Annotated[
-        str,
-        Header(alias="x-auth-token"),
-    ],
+        HTTPAuthorizationCredentials | None,
+        Depends(static_api_token),
+    ] = None,
 ):
-    if request.method in UNSAFE_METHODS:
-        if api_token in API_TOKENS:
-            return
+    if request.method not in UNSAFE_METHODS:
+        return
+    if api_token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized. Invalid token",
+            detail="Unauthorized. Token is required.",
         )
+
+    if api_token.credentials in API_TOKENS:
+        return
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorized. Invalid token",
+    )
