@@ -7,18 +7,17 @@ from fastapi import (
     Request,
     status,
 )
-from fastapi.params import Depends, Query, Header
+from fastapi.params import Depends
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBearer,
     HTTPBasicCredentials,
     HTTPBasic,
 )
-from websockets.sync.server import basic_auth
 
+from api.api_v1.movie_catalog.auth.services.redis_users_helper import redis_users
 from api.api_v1.movie_catalog.crud import storage
-from api.api_v1.movie_catalog.redis import redis_tokens
-from core.config import USER_DB, REDIS_API_TOKENS_SET_NAME
+from api.api_v1.movie_catalog.auth.services.redis_tokens_helper import redis_tokens
 from schemas.movie import Movie
 
 logger = logging.getLogger(__name__)
@@ -85,8 +84,6 @@ def validate_api_token(api_token):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized. Token is required.",
         )
-    # if api_token.credentials in API_TOKENS:
-    #     return
     if redis_tokens.is_token_exists(api_token.credentials):
         return
     raise HTTPException(
@@ -104,21 +101,19 @@ def user_basic_auth_required_for_unsafe_methods(
 ):
     if request.method not in UNSAFE_METHODS:
         return
-
     validate_user_auth(api_token)
 
 
 def validate_user_auth(api_token: HTTPBasicCredentials):
-    if (
-        api_token
-        and api_token.username in USER_DB
-        and USER_DB[api_token.username] == api_token.password
+    if redis_users.validate_user_password(
+        user=api_token.username,
+        password=api_token.password,
     ):
         return
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Unauthorized. Username or password is incorrect.",
-        headers={"WWW-Authenticate": "Basic"},
+        # headers={"WWW-Authenticate": "Basic"},
     )
 
 
