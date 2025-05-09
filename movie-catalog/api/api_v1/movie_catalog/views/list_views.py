@@ -32,16 +32,6 @@ router = APIRouter(
                 },
             },
         },
-        status.HTTP_409_CONFLICT: {
-            "description": "Movie already exists",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "detail": "Movie with slug='foobar' already exists.",
-                    },
-                },
-            },
-        },
     },
 )
 
@@ -79,6 +69,18 @@ async def add_movie_from_form(
     "/",
     response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_409_CONFLICT: {
+            "description": "Movie already exists",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Movie with slug='foobar' already exists.",
+                    },
+                },
+            },
+        },
+    },
 )
 async def add_movie(
     movie: MovieCreate,
