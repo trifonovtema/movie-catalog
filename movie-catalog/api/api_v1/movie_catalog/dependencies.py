@@ -75,12 +75,15 @@ def api_token_check_for_unsafe_methods(
 ):
     if request.method not in UNSAFE_METHODS:
         return
+    validate_api_token(api_token)
+
+
+def validate_api_token(api_token):
     if api_token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized. Token is required.",
         )
-
     if api_token.credentials in API_TOKENS:
         return
     raise HTTPException(
@@ -89,7 +92,7 @@ def api_token_check_for_unsafe_methods(
     )
 
 
-def basic_auth_check(
+def user_basic_auth_required_for_unsafe_methods(
     request: Request,
     api_token: Annotated[
         HTTPBasicCredentials | None,
@@ -99,16 +102,44 @@ def basic_auth_check(
     if request.method not in UNSAFE_METHODS:
         return
 
-    logger.info(f"Basic auth check for {api_token}")
+    validate_user_auth(api_token)
+
+
+def validate_user_auth(api_token: HTTPBasicCredentials):
     if (
         api_token
         and api_token.username in USER_DB
         and USER_DB[api_token.username] == api_token.password
     ):
         return
-
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Unauthorized. Username or password is incorrect.",
         headers={"WWW-Authenticate": "Basic"},
+    )
+
+
+def api_token_or_user_basic_auth_required_for_unsafe_methods(
+    request: Request,
+    user_credentials: Annotated[
+        HTTPBasicCredentials | None,
+        Depends(basic_auth_token),
+    ] = None,
+    api_token: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(static_api_token),
+    ] = None,
+) -> None:
+    if request.method not in UNSAFE_METHODS:
+        return
+    if api_token:
+        validate_api_token(api_token)
+        return
+    if user_credentials:
+        validate_user_auth(user_credentials)
+        return
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorized. Username and password or API token must be specified.",
     )
