@@ -8,9 +8,16 @@ from fastapi import (
     status,
 )
 from fastapi.params import Depends, Query, Header
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+    HTTPBasicCredentials,
+    HTTPBasic,
+)
+from websockets.sync.server import basic_auth
+
 from api.api_v1.movie_catalog.crud import storage
-from core.config import API_TOKENS
+from core.config import API_TOKENS, USER_DB
 from schemas.movie import Movie
 
 logger = logging.getLogger(__name__)
@@ -27,6 +34,12 @@ UNSAFE_METHODS = frozenset(
 static_api_token = HTTPBearer(
     scheme_name="api-token",
     description="API Token",
+    auto_error=False,
+)
+
+basic_auth_token = HTTPBasic(
+    scheme_name="Basic",
+    description="Basic Auth",
     auto_error=False,
 )
 
@@ -73,4 +86,29 @@ def api_token_check_for_unsafe_methods(
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Unauthorized. Invalid token",
+    )
+
+
+def basic_auth_check(
+    request: Request,
+    api_token: Annotated[
+        HTTPBasicCredentials | None,
+        Depends(basic_auth_token),
+    ] = None,
+):
+    if request.method not in UNSAFE_METHODS:
+        return
+
+    logger.info(f"Basic auth check for {api_token}")
+    if (
+        api_token
+        and api_token.username in USER_DB
+        and USER_DB[api_token.username] == api_token.password
+    ):
+        return
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorized. Username or password is incorrect.",
+        headers={"WWW-Authenticate": "Basic"},
     )
