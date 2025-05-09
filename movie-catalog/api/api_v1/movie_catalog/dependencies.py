@@ -87,7 +87,7 @@ def validate_api_token(api_token):
         )
     # if api_token.credentials in API_TOKENS:
     #     return
-    if redis_tokens.sismember(REDIS_API_TOKENS_SET_NAME, api_token.credentials) == 1:
+    if redis_tokens.is_token_exists(api_token.credentials):
         return
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
