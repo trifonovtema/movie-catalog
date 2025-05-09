@@ -105,7 +105,7 @@ def user_basic_auth_required_for_unsafe_methods(
 
 
 def validate_user_auth(api_token: HTTPBasicCredentials):
-    if redis_users.validate_user_password(
+    if api_token and redis_users.validate_user_password(
         user=api_token.username,
         password=api_token.password,
     ):
