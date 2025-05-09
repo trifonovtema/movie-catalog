@@ -16,3 +16,8 @@ API_TOKENS = frozenset(
         "dD9-iCLRDOutcmtr_xAFxw",
     }
 )
+
+USER_DB: dict[str, str] = {
+    "user1": "password1",
+    "user2": "password2",
+}
