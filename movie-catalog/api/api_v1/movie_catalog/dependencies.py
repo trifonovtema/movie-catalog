@@ -7,7 +7,7 @@ from fastapi import (
     Request,
     status,
 )
-from fastapi.params import Depends, Query
+from fastapi.params import Depends, Query, Header
 
 from api.api_v1.movie_catalog.crud import storage
 from core.config import API_TOKENS
@@ -51,7 +51,7 @@ def api_token_check_for_unsafe_methods(
     request: Request,
     api_token: Annotated[
         str,
-        Query(),
+        Header(alias="x-auth-token"),
     ],
 ):
     if request.method in UNSAFE_METHODS:
@@ -59,4 +59,5 @@ def api_token_check_for_unsafe_methods(
             return
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized. Invalid token",
         )
