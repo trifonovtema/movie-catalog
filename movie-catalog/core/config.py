@@ -21,3 +21,9 @@ USER_DB: dict[str, str] = {
     "user1": "password1",
     "user2": "password2",
 }
+
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
+REDIS_DB = 0
+REDIS_TOKENS_DB = 1
+REDIS_API_TOKENS_SET_NAME = "tokens"

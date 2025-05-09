@@ -17,7 +17,8 @@ from fastapi.security import (
 from websockets.sync.server import basic_auth
 
 from api.api_v1.movie_catalog.crud import storage
-from core.config import API_TOKENS, USER_DB
+from api.api_v1.movie_catalog.redis import redis_tokens
+from core.config import USER_DB, REDIS_API_TOKENS_SET_NAME
 from schemas.movie import Movie
 
 logger = logging.getLogger(__name__)
@@ -84,7 +85,9 @@ def validate_api_token(api_token):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized. Token is required.",
         )
-    if api_token.credentials in API_TOKENS:
+    # if api_token.credentials in API_TOKENS:
+    #     return
+    if redis_tokens.sismember(REDIS_API_TOKENS_SET_NAME, api_token.credentials) == 1:
         return
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
