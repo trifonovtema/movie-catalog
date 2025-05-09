@@ -72,16 +72,17 @@ class MovieStorage(BaseModel):
         return None
 
     def create(self, movie: Movie) -> Movie:
-        res = redis.hset(
+        self.save_to_storage(movie)
+        logger.info("Movie %s created", movie.slug)
+        return movie
+
+    @classmethod
+    def save_to_storage(cls, movie) -> int:
+        return redis.hset(
             name=config.REDIS_MOVIE_CATALOG_HASH_NAME,
             key=movie.slug,
             value=movie.model_dump_json(),
         )
-        # self.slug_to_movie[movie.slug] = movie
-        # self.save_to_disk()
-        # self.save_state()
-        logger.info("Movie %s created", movie.slug)
-        return movie
 
     def delete_by_slug(self, slug: str) -> None:
         self.slug_to_movie.pop(slug, None)
@@ -96,15 +97,13 @@ class MovieStorage(BaseModel):
     def update(self, movie: Movie, movie_in: MovieUpdate) -> Movie:
         for field, value in movie_in:
             setattr(movie, field, value)
-        # self.save_to_disk()
-        # self.save_state()
+        self.save_to_storage(movie)
         return movie
 
     def update_partial(self, movie: Movie, movie_in: MovieUpdatePartial) -> Movie:
         for field, value in movie_in.model_dump(exclude_unset=True).items():
             setattr(movie, field, value)
-        # self.save_to_disk()
-        # self.save_state()
+        self.save_to_storage(movie)
         return movie
 
     def init_storage(self):
