@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Form, BackgroundTasks, Depends
+from fastapi import APIRouter, Form, BackgroundTasks, Depends, HTTPException
 from starlette import status
 
 from api.api_v1.movie_catalog.crud import storage
@@ -28,6 +28,16 @@ router = APIRouter(
                 "application/json": {
                     "example": {
                         "detail": "Unauthorized. Invalid token",
+                    },
+                },
+            },
+        },
+        status.HTTP_409_CONFLICT: {
+            "description": "Movie already exists",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Movie with slug='foobar' already exists.",
                     },
                 },
             },
@@ -73,8 +83,9 @@ async def add_movie_from_form(
 async def add_movie(
     movie: MovieCreate,
 ) -> Movie:
-    return storage.create(
-        Movie(
-            **movie.model_dump(),
-        )
+    if not storage.get_by_slug(movie.slug):
+        return storage.create(movie_create=movie)
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail=f"Movie with slug={movie.slug!r} already exists.",
     )

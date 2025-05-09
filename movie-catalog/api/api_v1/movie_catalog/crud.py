@@ -9,6 +9,7 @@ from schemas.movie import (
     Movie,
     MovieUpdate,
     MovieUpdatePartial,
+    MovieCreate,
 )
 
 logger = logging.getLogger(__name__)
@@ -71,18 +72,21 @@ class MovieStorage(BaseModel):
             return Movie.model_validate_json(res)
         return None
 
-    # def create(self, movie: Movie) -> Movie:
-    #     self.save_to_storage(movie)
-    #     logger.info("Movie %s created", movie.slug)
-    #     return movie
+    def create(self, movie_create: MovieCreate) -> Movie:
+        movie = Movie(
+            **movie_create.model_dump(),
+        )
+        self.save_to_storage(movie)
+        logger.info("Movie %s created", movie.slug)
+        return movie
 
-    # @classmethod
-    # def save_to_storage(cls, movie) -> int:
-    #     return redis.hset(
-    #         name=config.REDIS_MOVIE_CATALOG_HASH_NAME,
-    #         key=movie.slug,
-    #         value=movie.model_dump_json(),
-    #     )
+    @classmethod
+    def save_to_storage(cls, movie) -> int:
+        return redis.hset(
+            name=config.REDIS_MOVIE_CATALOG_HASH_NAME,
+            key=movie.slug,
+            value=movie.model_dump_json(),
+        )
 
     def delete_by_slug(self, slug: str) -> int:
         # self.slug_to_movie.pop(slug, None)
