@@ -22,18 +22,18 @@ redis = Redis(
 
 
 class MovieStorage(BaseModel):
-    slug_to_movie: dict[str, Movie] = {}
+    # slug_to_movie: dict[str, Movie] = {}
     # file_name: str = MOVIE_STORAGE_FILEPATH
 
-    @classmethod
-    def from_state(cls) -> "MovieStorage":
-        if not MOVIE_STORAGE_FILEPATH.exists():
-            return MovieStorage()
-        return cls.model_validate_json(MOVIE_STORAGE_FILEPATH.read_text())
-
-    def save_state(self) -> None:
-        MOVIE_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
-        logger.info("Storage saved on disk")
+    # @classmethod
+    # def from_state(cls) -> "MovieStorage":
+    #     if not MOVIE_STORAGE_FILEPATH.exists():
+    #         return MovieStorage()
+    #     return cls.model_validate_json(MOVIE_STORAGE_FILEPATH.read_text())
+    #
+    # def save_state(self) -> None:
+    #     MOVIE_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
+    #     logger.info("Storage saved on disk")
 
     # def save_to_disk(self):
     #     with open(self.file_name, "w") as f:
@@ -71,22 +71,25 @@ class MovieStorage(BaseModel):
             return Movie.model_validate_json(res)
         return None
 
-    def create(self, movie: Movie) -> Movie:
-        self.save_to_storage(movie)
-        logger.info("Movie %s created", movie.slug)
-        return movie
+    # def create(self, movie: Movie) -> Movie:
+    #     self.save_to_storage(movie)
+    #     logger.info("Movie %s created", movie.slug)
+    #     return movie
 
-    @classmethod
-    def save_to_storage(cls, movie) -> int:
-        return redis.hset(
-            name=config.REDIS_MOVIE_CATALOG_HASH_NAME,
-            key=movie.slug,
-            value=movie.model_dump_json(),
-        )
+    # @classmethod
+    # def save_to_storage(cls, movie) -> int:
+    #     return redis.hset(
+    #         name=config.REDIS_MOVIE_CATALOG_HASH_NAME,
+    #         key=movie.slug,
+    #         value=movie.model_dump_json(),
+    #     )
 
     def delete_by_slug(self, slug: str) -> int:
         # self.slug_to_movie.pop(slug, None)
-        return redis.hdel(config.REDIS_MOVIE_CATALOG_HASH_NAME, slug)
+        return redis.hdel(
+            config.REDIS_MOVIE_CATALOG_HASH_NAME,
+            slug,
+        )
         # self.save_to_disk()
         # self.save_state()
 
@@ -107,19 +110,19 @@ class MovieStorage(BaseModel):
         self.save_to_storage(movie)
         return movie
 
-    def init_storage(self):
-        try:
-            data = self.from_state()
-        except ValidationError as e:
-            logger.warning("Error loading storage: %s", e)
-            self.save_state()
-            logger.warning("Storage recreated")
-            return
-
-        self.slug_to_movie.update(
-            data.slug_to_movie,
-        )
-        logger.warning("Storage loaded from disk")
+    # def init_storage(self):
+    #     try:
+    #         data = self.from_state()
+    #     except ValidationError as e:
+    #         logger.warning("Error loading storage: %s", e)
+    #         self.save_state()
+    #         logger.warning("Storage recreated")
+    #         return
+    #
+    #     self.slug_to_movie.update(
+    #         data.slug_to_movie,
+    #     )
+    #     logger.warning("Storage loaded from disk")
 
 
 storage = MovieStorage()

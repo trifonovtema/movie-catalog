@@ -56,14 +56,14 @@ def prefetch_movie_by_slug(
     )
 
 
-def save_movie_storage_state(
-    request: Request,
-    background_tasks: BackgroundTasks,
-):
-    yield
-    if request.method in UNSAFE_METHODS:
-        background_tasks.add_task(storage.save_state)
-        logger.info(f"Background task for save movie storage state added")
+# def save_movie_storage_state(
+#     request: Request,
+#     background_tasks: BackgroundTasks,
+# ):
+#     yield
+#     if request.method in UNSAFE_METHODS:
+#         background_tasks.add_task(storage.save_state)
+#         logger.info(f"Background task for save movie storage state added")
 
 
 def api_token_check_for_unsafe_methods(

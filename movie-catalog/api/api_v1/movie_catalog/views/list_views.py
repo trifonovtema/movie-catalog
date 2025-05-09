@@ -5,9 +5,9 @@ from starlette import status
 
 from api.api_v1.movie_catalog.crud import storage
 from api.api_v1.movie_catalog.dependencies import (
-    save_movie_storage_state,
-    api_token_check_for_unsafe_methods,
-    user_basic_auth_required_for_unsafe_methods,
+    # save_movie_storage_state,
+    # api_token_check_for_unsafe_methods,
+    # user_basic_auth_required_for_unsafe_methods,
     api_token_or_user_basic_auth_required_for_unsafe_methods,
 )
 from schemas.movie import Movie, MovieCreate, MovieRead
@@ -19,7 +19,7 @@ router = APIRouter(
         # Depends(api_token_check_for_unsafe_methods),
         # Depends(user_basic_auth_required_for_unsafe_methods),
         Depends(api_token_or_user_basic_auth_required_for_unsafe_methods),
-        Depends(save_movie_storage_state),
+        # Depends(save_movie_storage_state),
     ],
     responses={
         status.HTTP_401_UNAUTHORIZED: {
