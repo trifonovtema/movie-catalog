@@ -35,6 +35,11 @@ class RedisTokensHelper(AbstractTokensHelper):
             token,
         )
 
+    def get_tokens(self) -> set[str]:
+        return self.redis.smembers(
+            name=self.token_set_name,
+        )
+
 
 redis_tokens = RedisTokensHelper(
     host=config.REDIS_HOST,
