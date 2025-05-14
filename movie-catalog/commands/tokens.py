@@ -28,3 +28,11 @@ def check(
         "[bold]" + token + "[/bold]",
         "[green]exists[/green]" if res is True else "[red]does not exist[/red]",
     )
+
+
+@app.command()
+def list():
+    """
+    List all tokens
+    """
+    [print("[bold]" + token + "[/bold]") for token in redis_tokens.get_tokens()]
