@@ -30,8 +30,8 @@ def check(
     )
 
 
-@app.command()
-def list():
+@app.command(name="list")
+def list_tokens():
     """
     List all tokens
     """
