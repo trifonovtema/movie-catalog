@@ -38,7 +38,7 @@ class AbstractTokensHelper(ABC):
     def generate_token(cls) -> str:
         return secrets.token_urlsafe(16)
 
-    def generate_and_save_token(self, token: str) -> str:
+    def generate_and_save_token(self) -> str:
         token = self.generate_token()
         self.add_token(token)
         return token
