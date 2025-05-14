@@ -35,9 +35,11 @@ class RedisTokensHelper(AbstractTokensHelper):
             token,
         )
 
-    def get_tokens(self) -> set[str]:
-        return self.redis.smembers(
-            name=self.token_set_name,
+    def get_tokens(self) -> list[str]:
+        return list(
+            self.redis.smembers(
+                name=self.token_set_name,
+            )
         )
 
 

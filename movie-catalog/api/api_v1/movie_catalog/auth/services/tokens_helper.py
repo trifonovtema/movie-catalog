@@ -20,7 +20,7 @@ class AbstractTokensHelper(ABC):
         """
 
     @abstractmethod
-    def get_tokens(self) -> set[str]:
+    def get_tokens(self) -> list[str]:
         """
         Get all tokens
         :return:
