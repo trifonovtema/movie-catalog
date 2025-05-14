@@ -1,0 +1,30 @@
+from typing import Annotated
+
+import typer
+from rich import print
+from api.api_v1.movie_catalog.auth.services.redis_tokens_helper import redis_tokens
+
+app = typer.Typer(
+    no_args_is_help=True,
+    rich_markup_mode="rich",
+    name="tokens",
+    help="Work with tokens",
+)
+
+
+@app.command()
+def check(
+    token: Annotated[
+        str,
+        typer.Argument(help="Token to check"),
+    ],
+):
+    """
+    Check if passed token exists or not
+    """
+    res = redis_tokens.is_token_exists(token)
+    print(
+        "Token",
+        "[bold]" + token + "[/bold]",
+        "[green]exists[/green]" if res is True else "[red]does not exist[/red]",
+    )
