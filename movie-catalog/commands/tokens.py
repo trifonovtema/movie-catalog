@@ -2,6 +2,8 @@ from typing import Annotated
 
 import typer
 from rich import print
+from rich.markdown import Markdown
+
 from api.api_v1.movie_catalog.auth.services.redis_tokens_helper import redis_tokens
 
 app = typer.Typer(
@@ -35,4 +37,10 @@ def list_tokens():
     """
     List all tokens
     """
-    [print("[bold]" + token + "[/bold]") for token in redis_tokens.get_tokens()]
+    print(Markdown("# API Tokens List"))
+    print(
+        Markdown(
+            "".join(["\n - *" + token + "*" for token in redis_tokens.get_tokens()])
+        )
+    )
+    print()
