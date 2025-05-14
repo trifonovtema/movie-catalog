@@ -44,3 +44,40 @@ def list_tokens():
         )
     )
     print()
+
+
+@app.command(name="create")
+def create():
+    """
+    Create a new token and add it to database
+    """
+    token = redis_tokens.generate_and_save_token()
+    print("Token", "[bold]" + token + "[/bold]", "created")
+
+
+@app.command(name="add")
+def add(
+    token: Annotated[
+        str,
+        typer.Argument(help="Token to add"),
+    ],
+):
+    """
+    Add passed token to database
+    """
+    redis_tokens.add_token(token)
+    print("Token", "[bold]" + token + "[/bold]", "added")
+
+
+@app.command(name="rm")
+def remove(
+    token: Annotated[
+        str,
+        typer.Argument(help="Token to add"),
+    ],
+):
+    """
+    Remove passed token from database
+    """
+    redis_tokens.delete_token(token)
+    print("Token", "[bold]" + token + "[/bold]", "removed")
